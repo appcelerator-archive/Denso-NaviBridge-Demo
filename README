@@ -1,18 +1,10 @@
-Welcome to your Appcelerator Titanium Mobile Project
+This project runs on Alloy and requires a little work before firing it up (because I didn't want to add huge files to the Git repo).
 
-This is a blank project.  Start by editing your application's app.js to 
-make your first mobile project using Titanium.
+Steps to get set up:
 
+(1) Import the project to Titanium Studio 
+(2) Add a folder named "Resources" at the root of the project
+(3) Inside of the project directory, run the command "alloy compile"
+(4) Run the app in the simulator
 
-
-----------------------------------
-Stuff our legal folk make us say:
-
-Appcelerator, Appcelerator Titanium and associated marks and logos are 
-trademarks of Appcelerator, Inc. 
-
-Titanium is Copyright (c) 2008-2012 by Appcelerator, Inc. All Rights Reserved.
-
-Titanium is licensed under the Apache Public License (Version 2). Please
-see the LICENSE file for the full license.
-
+Currently tested on TIMOB 2.1.3GA, iPhone-only (5.X).
