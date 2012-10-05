@@ -1,0 +1,34 @@
+<Alloy>
+	<Window id="wrapper">
+		<View id="header">
+			<View id="iconContainer">
+				<ImageView id="iconCoffee" category="coffee" class="icon" image="/images/icon/iconCoffeeActive.png" />
+				<ImageView id="iconGas" category="servicestations" class="icon" image="/images/icon/iconGas.png" />
+				<ImageView id="iconFood" category="food" class="icon" image="/images/icon/iconFood.png" />
+				<ImageView id="iconBar" category="beer_and_wine" class="icon" image="/images/icon/iconBar.png" />
+				<ImageView id="iconActive" category="active" class="icon" image="/images/icon/iconActive.png" />
+				<ImageView id="iconArt" category="arts" class="icon" image="/images/icon/iconArt.png" />
+			</View>
+			
+			<ImageView id="underline" image="/images/underline.png" />
+		</View>
+		
+		<View id="details">
+			<Label id="detailName" />
+			
+			<Label id="detailDistance" />
+			
+			<View id="starContainer" />
+			
+			<Label id="detailAddress1" class="address" />
+			<Label id="detailAddress2" class="address" />
+			<Label id="detailPhone" />
+			
+			<View id="addButton">
+				<Label id="addButtonText" text="Add to GPS" />
+			</View>
+		</View>
+		
+		<View ns="Ti.Map" id="map" userLocation="true" regionFit="true" />
+	</Window>
+</Alloy>

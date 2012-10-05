@@ -1,0 +1,5 @@
+"#GlobalWrapper": {
+	navBarHidden: true,
+	exitOnClose: true,
+	backgroundColor: "#FFF"
+}

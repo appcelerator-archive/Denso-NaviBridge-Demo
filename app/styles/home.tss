@@ -1,0 +1,120 @@
+"#wrapper": {
+	backgroundColor: "#000"
+},
+"#header": {
+	backgroundImage: "/images/headerBackground.png",
+	width: Ti.UI.FILL,
+	height: 134,
+	top: 0,
+	left: 0,
+	zIndex: 100
+},
+"#details": {
+	backgroundImage: "/images/detailBackground.png",
+	width: Ti.UI.FILL,
+	height: 155,
+	top: -37, // 118
+	left: 0,
+	layout: "vertical",
+	zIndex: 99
+},
+"#map": {
+	width: Ti.UI.FILL,
+	height: Ti.UI.FILL,
+	top: 123,
+	left: 0,
+	zIndex: 98
+},
+"#iconContainer": {
+	height: 37,
+	width: 297,
+	top: 65,
+	left: 12,
+	layout: "horizontal"
+},
+".icon": {
+	top: 0,
+	left: 10,
+	width: 37,
+	height: 37
+},
+"#underline": {
+	top: 107,
+	left: 18,
+	width: 45,
+	height: 2
+},
+"#detailName": {
+	top: 15,
+	left: 20,
+	right: 90,
+	width: Ti.UI.FILL,
+	height: 19,
+	font: {
+		fontSize: 15,
+		fontWeight: "bold"
+	},
+	color: "#DA251C"
+},
+"#detailDistance": {
+	top: -19,
+	right: 20,
+	width: 50,
+	height: 19,
+	font: {
+		fontSize: 12,
+		fontWeight: "bold"
+	},
+	color: "#999",
+	textAlign: "right"
+},
+"#starContainer": {
+	top: 5,
+	left: 20,
+	bottom: 5,
+	width: 50,
+	height: 10,
+	layout: "horizontal"
+},
+".address": {
+	top: 0,
+	left: 20,
+	height: 16,
+	width: Ti.UI.FILL,
+	right: 141,
+	font: {
+		fontSize: 12,
+		fontWeight: "bold"
+	},
+	color: "#AAA"
+},
+"#detailPhone": {
+	top: 0,
+	left: 20,
+	height: 16,
+	font: {
+		fontSize: 12,
+		fontWeight: "bold"
+	},
+	color: "#1C6CDA"
+},
+"#addButton": {
+	top: -31,
+	right: 20,
+	width: 101,
+	height: 31,
+	backgroundImage: "/images/button.png"
+},
+"#addButtonText": {
+	top: 0,
+	left: 0,
+	width: Ti.UI.FILL,
+	height: Ti.UI.FILL,
+	font: {
+		fontSize: 12,
+		fontWeight: "bold"
+	},
+	color: "#FFF",
+	textAlign: "center",
+	touchEnabled: false
+}
