@@ -1,6 +1,8 @@
 <Alloy>
-	<Window id="wrapper">
+	<View id="wrapper">
 		<View id="header">
+			<ImageView id="logo" image="/images/logo.png" />
+			
 			<View id="iconContainer">
 				<ImageView id="iconCoffee" category="coffee" class="icon" image="/images/icon/iconCoffeeActive.png" />
 				<ImageView id="iconGas" category="servicestations" class="icon" image="/images/icon/iconGas.png" />
@@ -10,7 +12,7 @@
 				<ImageView id="iconArt" category="arts" class="icon" image="/images/icon/iconArt.png" />
 			</View>
 			
-			<ImageView id="underline" image="/images/underline.png" />
+			<ImageView id="underline" image="/images/underline.png" platform="ios" />
 		</View>
 		
 		<View id="details">
@@ -25,10 +27,20 @@
 			<Label id="detailPhone" />
 			
 			<View id="addButton">
-				<Label id="addButtonText" text="Add to GPS" />
+				<Label id="addButtonText" text="Send to NaviCon" />
 			</View>
 		</View>
 		
 		<View ns="Ti.Map" id="map" userLocation="true" regionFit="true" />
-	</Window>
+		
+		<View id="toggle">
+			<View id="toggleMap" class="toggleButton">
+				<Label class="toggleButtonText" text="Map" />
+			</View>
+			
+			<View id="toggleList" class="toggleButton">
+				<Label class="toggleButtonText" text="List" />
+			</View>
+		</View>
+	</View>
 </Alloy>

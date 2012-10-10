@@ -86,7 +86,7 @@ var NAVIBRIDGE = (function() {
 	URL to invoke your application/web site from NaviCon
 	This parameter is used to invoke your application/web site from NaviCon after NaviCon sends POI to car navigation system. Your application can achieve to provide a seamless service to users by using this parameter.
 	When NaviCon can’t send POI to car navigation system, NaviCon doesn’t invoke your application/web site. 
-
+	
 	 */
 	
 	API.SetApplicationID = function(appID) {
@@ -110,12 +110,10 @@ var NAVIBRIDGE = (function() {
 	
 	API.installNavi = function() {
 		API.fireConsoleEvent( "open install:" + API.installIPhone );
-		
 		Ti.Platform.openURL(API.installIPhone);
 	}//end installNavi
 	
 	API.addPOI = function( poi ) {
-		//var appURL = "navicon://setPOI?ver=1.4&ll=37.38922,-122.048496&appName=ICiAV4Ay&title=Title";
 		var appURL = "navicon://setPOI?ver=1.3&ll=37.38922,-122.048496&appName="+API.ApplicationID;
 		
 		if ( poi != null ){
@@ -129,39 +127,46 @@ var NAVIBRIDGE = (function() {
 					if ( poi.title != null )
 					{
 						appURL += "&title=" + poi.title;
-						//appURL+= "&title=" + poi.title;
 					}
 					if ( poi.tel != null )
 					{
 						appURL += "&tel=" + poi.tel;
-						//appURL+= "&tel=" + poi.tel;
 					}
 					if ( poi.text != null )
 					{
 						appURL += "&text=" + poi.text;
-						//appURL+= "&text=" + poi.text;
 					}
 					if ( poi.callURL != null )
 					{
 						appURL += "&callURL=" + poi.callURL;
-						//appURL+= "&callURL=" + poi.callURL;
 					}//end if callURL
 					
 					appURL += "&appName="+API.ApplicationID;
 				}//end if
+				else
+				{
+					Ti.API.info("ERROR: POI Null" );
+					return;
+				}//end else no lon defined
 			}//end set lat lon
-			
-			//"&radKM="+"15" +
-			//"&addr="+"440 Bernardo Ave Mountain View, CA 94043";
-			
+			else
+			{
+				Ti.API.info("ERROR: POI Null" );
+				return;
+			}//end else if no lat defined
 		}//end poi
+		else
+		{
+			Ti.API.info("ERROR: POI Null" );
+			return;
+		}
 		API.fireConsoleEvent( "addPOI =>"  + appURL );
 		
 		Ti.Platform.openURL(appURL);
 	}//end addPOI
 	
 	API.addPOIMultiple = function( wayPointArray ) {
-		API.fireConsoleEvent( "addPOIMultiple => NOT IMPLIMENTED " );//  + API._URLschemeADDPOI_MULTIPLE );
+		Ti.API.info( "addPOIMultiple => NOT IMPLIMENTED " );
 		Ti.Platform.openURL("navicon://setPOI?ver=1.3&ll=37.38922,-122.048496&appName=ICiAV4Ay");
 	}//end addPOIMultiple
 	
@@ -191,7 +196,6 @@ var NAVIBRIDGE = (function() {
 		
 		var InsertPOIButton = Ti.UI.createButton({ top:95, title:'Insert POI', height:40, width:200 });
 		InsertPOIButton.addEventListener('click', function(){ NAVIBRIDGE.addPOI({ lat:37.38922, lon:-122.048496});  });
-		//InsertPOIButton.addEventListener('click', function(){ NAVIBRIDGE.addPOI({lat:"37.38922", lon:"-122.048496",text:"Appc" });  });
 		topView.add( InsertPOIButton );
 		
 		var InsertPOIArrayButton = Ti.UI.createButton({ top:140, title:'Insert Multiple POIs', height:40, width:200 });

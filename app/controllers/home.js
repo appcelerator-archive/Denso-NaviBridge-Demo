@@ -54,13 +54,15 @@ $.highlightActiveIcon = function(_id) {
 			// Is the selected icon
 			icons[i].element.image = "/images/icon/" + icons[i].id + "Active.png";
 			
-			// Move the underline selection indicator
-			var animation = Ti.UI.createAnimation({
-				left: (18 + (i * 47)),
-				duration: 500
-			});
-			
-			$.underline.animate(animation);
+			if(OS_IOS) {
+				// Move the underline selection indicator
+				var animation = Ti.UI.createAnimation({
+					left: (18 + (i * 47)) + "dp",
+					duration: 500
+				});
+				
+				$.underline.animate(animation);
+			}
 		} else {
 			// Is NOT the selected icon
 			icons[i].element.image = "/images/icon/" + icons[i].id + ".png";
@@ -109,7 +111,13 @@ $.handleYelpResponse = function(_data) {
 	
 	// See if we have any valid business results
 	if(_data.total == 0) {
-		alert("No results found.");
+		var alert = Ti.UI.createAlertDialog({
+			ok: "OK",
+			message: "No results found",
+			title: "Sorry!"
+		});
+		
+		alert.show();
 	} else {
 		// Save the results
 		$.results = _data.businesses;
@@ -149,7 +157,8 @@ $.addBusinessToMap = function(_data) {
 		latitude: _data.location.coordinate.latitude,
 		longitude: _data.location.coordinate.longitude,
 		title: _data.name,
-		index: _data.index
+		index: _data.index,
+		pincolor: Ti.Map.ANNOTATION_RED,
 	});
 	
 	$.map.addAnnotation(annotation);
@@ -175,8 +184,8 @@ $.showDetails = function(_data) {
 		var star = Ti.UI.createImageView({
 			top: 0,
 			left: 0,
-			width: 10,
-			height: 10,
+			width: "10dp",
+			height: "10dp",
 			image: "/images/star.png"
 		});
 		
@@ -189,12 +198,12 @@ $.showDetails = function(_data) {
 		$.detailsVisible = true;
 		
 		var animation = Ti.UI.createAnimation({
-			top: 118,
+			top: "103dp",
 			duration: 500
 		});
 		
 		animation.addEventListener("complete", function(_event) {
-			$.details.top = 118;
+			$.details.top = "103dp";
 		});
 		
 		$.details.animate(animation);
@@ -211,12 +220,12 @@ $.hideDetails = function() {
 		$.detailsVisible = false;
 		
 		var animation = Ti.UI.createAnimation({
-			top: -37,
+			top: "-52dp",
 			duration: 500
 		});
 		
 		animation.addEventListener("complete", function(_event) {
-			$.details.top = -37;
+			$.details.top = "-52dp";
 		});
 		
 		$.details.animate(animation);
@@ -270,14 +279,15 @@ $.map.addEventListener("click", function(_event) {
 		// Show the details pane
 		$.showDetails($.results[_event.annotation.index]);
 		
-		// Push the pin down on the map so it's visible below the details pane (that's what the "/ 3" is for)
+		// Push the pin down on the map so it's visible below the details pane (that's what the "/ 2" is for)
 		$.map.setLocation({
-			latitude: _event.annotation.latitude + ($.map.longitudeDelta / 3),
+			latitude: OS_IOS ? _event.annotation.latitude + ($.map.longitudeDelta / 2) : _event.annotation.latitude,
 			longitude: _event.annotation.longitude,
-			latitudeDelta: $.map.latitudeDelta,
-			longitudeDelta: $.map.longitudeDelta,
+			latitudeDelta: OS_IOS ? $.map.latitudeDelta : 0.04,
+			longitudeDelta: OS_IOS ? $.map.longitudeDelta : 0.04,
 			animate: true
 		});
+		Ti.API.info("Leaving!");
 	}
 });
 

@@ -4,7 +4,7 @@
 "#header": {
 	backgroundImage: "/images/headerBackground.png",
 	width: Ti.UI.FILL,
-	height: 134,
+	height: "119dp",
 	top: 0,
 	left: 0,
 	zIndex: 100
@@ -12,8 +12,8 @@
 "#details": {
 	backgroundImage: "/images/detailBackground.png",
 	width: Ti.UI.FILL,
-	height: 155,
-	top: -37, // 118
+	height: "155dp",
+	top: "-52dp",
 	left: 0,
 	layout: "vertical",
 	zIndex: 99
@@ -21,100 +21,148 @@
 "#map": {
 	width: Ti.UI.FILL,
 	height: Ti.UI.FILL,
-	top: 123,
+	top: "108dp",
 	left: 0,
+	bottom: "50dp",
 	zIndex: 98
 },
+"#toggle": {
+	backgroundImage: "/images/toggleBackground.png",
+	width: Ti.UI.FILL,
+	height: "61dp",
+	bottom: 0,
+	left: 0,
+	zIndex: 100
+},
+"#logo": {
+	width: "233dp",
+	height: "39dp",
+	top: 0,
+	left: 0
+},
 "#iconContainer": {
-	height: 37,
-	width: 297,
-	top: 65,
-	left: 12,
+	height: "37dp",
+	width: "297dp",
+	top: "50dp",
 	layout: "horizontal"
 },
 ".icon": {
 	top: 0,
-	left: 10,
-	width: 37,
-	height: 37
+	left: "10dp",
+	width: "37dp",
+	height: "37dp"
 },
 "#underline": {
-	top: 107,
-	left: 18,
-	width: 45,
-	height: 2
+	top: "92dp",
+	left: "18dp",
+	width: "45dp",
+	height: "2dp"
 },
 "#detailName": {
-	top: 15,
-	left: 20,
-	right: 90,
+	top: "15dp",
+	left: "20dp",
+	right: "90dp",
 	width: Ti.UI.FILL,
-	height: 19,
+	height: "19dp",
 	font: {
-		fontSize: 15,
+		fontSize: "15dp",
 		fontWeight: "bold"
 	},
 	color: "#DA251C"
 },
 "#detailDistance": {
-	top: -19,
-	right: 20,
-	width: 50,
-	height: 19,
+	top: "-19dp",
+	right: "20dp",
+	width: "50dp",
+	height: "19dp",
 	font: {
-		fontSize: 12,
+		fontSize: "12dp",
 		fontWeight: "bold"
 	},
 	color: "#999",
 	textAlign: "right"
 },
 "#starContainer": {
-	top: 5,
-	left: 20,
-	bottom: 5,
-	width: 50,
-	height: 10,
+	top: "5dp",
+	left: "20dp",
+	bottom: "5dp",
+	width: "50dp",
+	height: "10dp",
 	layout: "horizontal"
 },
 ".address": {
 	top: 0,
-	left: 20,
-	height: 16,
+	left: "20dp",
+	height: "16dp",
 	width: Ti.UI.FILL,
-	right: 141,
+	right: "141dp",
 	font: {
-		fontSize: 12,
+		fontSize: "12dp",
 		fontWeight: "bold"
 	},
 	color: "#AAA"
 },
 "#detailPhone": {
 	top: 0,
-	left: 20,
-	height: 16,
+	left: "20dp",
+	height: "16dp",
 	font: {
-		fontSize: 12,
+		fontSize: "12dp",
 		fontWeight: "bold"
 	},
 	color: "#1C6CDA"
 },
 "#addButton": {
-	top: -31,
-	right: 20,
-	width: 101,
-	height: 31,
+	top: "-31dp",
+	right: "20dp",
+	width: "110dp",
+	height: "31dp",
 	backgroundImage: "/images/button.png"
 },
 "#addButtonText": {
 	top: 0,
 	left: 0,
 	width: Ti.UI.FILL,
-	height: Ti.UI.FILL,
+	height: "29dp",
 	font: {
-		fontSize: 12,
+		fontSize: "12dp",
 		fontWeight: "bold"
 	},
 	color: "#FFF",
 	textAlign: "center",
 	touchEnabled: false
+},
+".toggleButton": {
+	bottom: "10dp",
+	width: "110dp",
+	height: "31dp",
+	backgroundImage: "/images/button.png"
+},
+"#toggleMap": {
+	left: "20dp"
+},
+"#toggleList": {
+	right: "20dp"
+},
+".toggleButtonText": {
+	top: 0,
+	left: 0,
+	width: Ti.UI.FILL,
+	height: "29dp",
+	font: {
+		fontSize: "12dp",
+		fontWeight: "bold"
+	},
+	color: "#FFF",
+	textAlign: "center",
+	touchEnabled: false
+},
+"#header[platform=ios]": {
+	backgroundRepeat: true
+},
+"#details[platform=ios]": {
+	backgroundRepeat: true
+},
+"#toggle[platform=ios]": {
+	backgroundRepeat: true
 }
