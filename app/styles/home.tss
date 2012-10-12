@@ -26,6 +26,15 @@
 	bottom: "50dp",
 	zIndex: 98
 },
+"#list": {
+	width: Ti.UI.FILL,
+	height: Ti.UI.FILL,
+	top: "108dp",
+	left: 0,
+	bottom: "50dp",
+	zIndex: 98,
+	opacity: 0
+},
 "#toggle": {
 	backgroundImage: "/images/toggleBackground.png",
 	width: Ti.UI.FILL,
@@ -156,13 +165,4 @@
 	color: "#FFF",
 	textAlign: "center",
 	touchEnabled: false
-},
-"#header[platform=ios]": {
-	backgroundRepeat: true
-},
-"#details[platform=ios]": {
-	backgroundRepeat: true
-},
-"#toggle[platform=ios]": {
-	backgroundRepeat: true
 }

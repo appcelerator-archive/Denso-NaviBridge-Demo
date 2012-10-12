@@ -33,6 +33,8 @@
 		
 		<View ns="Ti.Map" id="map" userLocation="true" regionFit="true" />
 		
+		<TableView id="list"></TableView>
+		
 		<View id="toggle">
 			<View id="toggleMap" class="toggleButton">
 				<Label class="toggleButtonText" text="Map" />

@@ -6,6 +6,7 @@ $.detailsVisible = false;
 $.location = null;
 $.results = null;
 $.pinSelectionChanged = false;
+$.currentPinSelection = null;
 
 // Geolocation settings
 Ti.Geolocation.accuracy = Ti.Geolocation.ACCURACY_BEST;
@@ -109,6 +110,12 @@ $.handleYelpResponse = function(_data) {
 	// Remove all existing annotations
 	$.map.removeAllAnnotations();
 	
+	// Clear the 'selected pin' variable
+	$.currentPinSelection = null;
+	
+	// Remove all existing table rows
+	$.list.setData([]);
+	
 	// See if we have any valid business results
 	if(_data.total == 0) {
 		var alert = Ti.UI.createAlertDialog({
@@ -132,6 +139,7 @@ $.handleYelpResponse = function(_data) {
 			// Make sure the business isn't closed for good
 			if(business.is_closed === false) {
 				$.addBusinessToMap(business);
+				$.addBusinessToTable(business);
 			}
 		}
 		
@@ -165,10 +173,85 @@ $.addBusinessToMap = function(_data) {
 };
 
 /**
+ * Adds a row to the table for a business
+ * @param {Object} _data The business data
+ */
+$.addBusinessToTable = function(_data) {
+	// Create the row
+	var row = Ti.UI.createTableViewRow({
+		height: "69dp",
+		latitude: _data.location.coordinate.latitude,
+		longitude: _data.location.coordinate.longitude,
+		index: _data.index
+	});
+	
+	// Create meta-data elements
+	var title = Ti.UI.createLabel({
+		top: "15dp",
+		left: "15dp",
+		bottom: "15dp",
+		right: "80dp",
+		height: "39dp",
+		font: {
+			fontSize: "18dp",
+			fontWeight: "bold"
+		},
+		color: "#DA251C",
+		touchEnabled: false,
+		text: _data.name
+	});
+	
+	var distance = Ti.UI.createLabel({
+		top: "15dp",
+		right: "15dp",
+		width: "50dp",
+		height: "14dp",
+		font: {
+			fontSize: "12dp",
+			fontWeight: "bold"
+		},
+		color: "#999",
+		textAlign: "right",
+		touchEnabled: false,
+		text: (Math.round((_data.distance / 1609.344) * 10) / 10) + "mi"
+	});
+	
+	var starContainer = Ti.UI.createView({
+		top: "44dp",
+		right: "15dp",
+		bottom: "15dp",
+		width: (Math.round(_data.rating) * 10) + "dp",
+		height: "10dp",
+		touchEnabled: false,
+		layout: "horizontal"
+	});
+	
+	// Create the Yelp rating stars
+	for(var i = 0; i < Math.round(_data.rating); i++) {
+		var star = Ti.UI.createImageView({
+			top: 0,
+			left: 0,
+			width: "10dp",
+			height: "10dp",
+			image: "/images/star.png",
+			touchEnabled: false
+		});
+		
+		starContainer.add(star);
+	}
+	
+	row.add(title);
+	row.add(distance);
+	row.add(starContainer);
+	
+	$.list.appendRow(row);
+};
+
+/**
  * Opens the details pane with business information
  * @param {Object} _data The business data
  */
-$.showDetails = function(_data) {
+$.showMapDetails = function(_data) {
 	// Keep track of the current business
 	$.currentBusiness = _data;
 	
@@ -208,6 +291,21 @@ $.showDetails = function(_data) {
 		
 		$.details.animate(animation);
 	}
+};
+
+/**
+ * Opens the details pane with business information
+ * @param {Object} _data The business data
+ */
+$.showListDetails = function(_data) {
+	// Keep track of the current business
+	$.currentBusiness = _data;
+	
+	// Add the business location to the GPS unit
+	APP.NaviBridge.addPOI({
+		lat: $.currentBusiness.location.coordinate.latitude,
+		lon: $.currentBusiness.location.coordinate.longitude
+	});
 };
 
 /**
@@ -277,18 +375,23 @@ $.map.addEventListener("click", function(_event) {
 		$.pinSelectionChanged = true;
 		
 		// Show the details pane
-		$.showDetails($.results[_event.annotation.index]);
+		$.showMapDetails($.results[_event.annotation.index]);
+		
+		// Save which pin we clicked on
+		$.currentPinSelection = _event.annotation;
 		
 		// Push the pin down on the map so it's visible below the details pane (that's what the "/ 2" is for)
 		$.map.setLocation({
-			latitude: OS_IOS ? _event.annotation.latitude + ($.map.longitudeDelta / 2) : _event.annotation.latitude,
+			latitude: OS_IOS ? _event.annotation.latitude + ($.map.longitudeDelta / 3) : _event.annotation.latitude,
 			longitude: _event.annotation.longitude,
-			latitudeDelta: OS_IOS ? $.map.latitudeDelta : 0.04,
-			longitudeDelta: OS_IOS ? $.map.longitudeDelta : 0.04,
 			animate: true
 		});
-		Ti.API.info("Leaving!");
 	}
+});
+
+// Adds an event listener to the list which auto-adds a waypoint to the GPS
+$.list.addEventListener("click", function(_event) {
+	$.showListDetails($.results[_event.index]);
 });
 
 // Add an event listener to the "Add to GPS" button
@@ -306,6 +409,27 @@ $.detailPhone.addEventListener("click", function(_event) {
 	Ti.Platform.openURL("tel:" + _event.source.text);
 });
 
+// Add event listeners to switch between map and list views
+$.toggleMap.addEventListener("click", function(_event) {
+	$.map.opacity = 1;
+	$.list.opacity = 0;
+});
+
+$.toggleList.addEventListener("click", function(_event) {
+	// Close the details view for the map
+	$.hideDetails();
+	
+	// Try and de-select the annotation on the map
+	if($.currentPinSelection != null) {
+		try {
+			$.map.deselectAnnotation($.currentPinSelection);
+		} catch(_error) {}
+	}
+	
+	$.map.opacity = 0;
+	$.list.opacity = 1;
+});
+
 // Add an event listener for geolocation updates
 Ti.Geolocation.addEventListener("location", function(_data) {
 	// Save the location of the user
@@ -315,8 +439,6 @@ Ti.Geolocation.addEventListener("location", function(_data) {
 	$.map.setLocation({
 		latitude: _data.coords.latitude,
 		longitude: _data.coords.longitude,
-		latitudeDelta: $.map.latitudeDelta ? $.map.latitudeDelta : 0.04,
-		longitudeDelta: $.map.longitudeDelta ? $.map.longitudeDelta : 0.04,
 		animate: true
 	});
 });
