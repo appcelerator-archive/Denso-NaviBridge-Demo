@@ -50,7 +50,7 @@ var APP = {
 		Ti.App.addEventListener("resumed", APP.resume);
 		
 		// Set up NaviBridge library
-		APP.NaviBridge.SetApplicationID("ICiAV4Ay");
+		APP.NaviBridge.setApplicationId("ICiAV4Ay");
 	},
 	/**
 	 * Global event handler to change screens

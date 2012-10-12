@@ -1,238 +1,284 @@
+/**
+ * The NaviBridge module allows developers to send POI (point of interest) locations to the NaviBridge application, which can then send
+ * the location to a Denso in-dash display unit.
+ *
+ * Developers must register for a key ("Application ID") to authenticate calls to the NaviBridge system:
+ *		Japan:
+ *			Register: https://navicon.denso.co.jp/navicon_download/
+ *			iOS Application: http://itunes.apple.com/jp/app/navicon-kanabi-lian-xie/id368186022?mt=8
+ *		US:
+ *			Register: http://www.globaldenso.com/en/products/aftermarket/navibridge/index.html
+ *
+ * All coordinates must be passed to NaviBridge as a decimal. NaviBridge uses the WGS84 datum with the following range limitations:
+ *		-90.0 < lat < 90.0
+ *		-180.0 <= lng <= 180.0
+ */
 
 var NAVIBRIDGE = (function() {
-  	
-  	var API = {};
-  	API.isIOS = (Ti.Platform.osname === 'iphone' || Ti.Platform.osname ==='ipad' )? true : false;
-	
-  	API.ApplicationID = "tjKEEUqB";//"DEADBEEF";ICiAV4Ay
-  	API.ver = "1.4";
-  	
-  	API.URLschemeBASE = "navicon://"; //fb://<insert function here>"
-	API.installIPhone = "http://itunes.apple.com/us/app/navibridge/id498898448?mt=8";
-	API.installAndroid = "http://appcappstore.s3.amazonaws.com/navibridge/NaviBridge_Appcelerator_test_v3.3f.apk";
-	
-	// NaviCon: navicon://setPOI?ver=1.3&ll=38.270348,140.871357&appName=ICiAV4Ay
-	
-	/*
-	README.MD
-		The navibridge Module allows developers to send "Points Of Interest" Locations the the NaviBridge application and Denos In Dash Display
-		
-		Developers must register for a key to talk with the naviBridge system:
-			Japanes Register ... Key ( navicon )
-			https://navicon.denso.co.jp/navicon_download/
-			jp install url jp install: http://itunes.apple.com/jp/app/navicon-kanabi-lian-xie/id368186022?mt=8
-			
-			Navi Bridge US site:
-			http://www.globaldenso.com/en/products/aftermarket/navibridge/index.html
-			
-	================================================
-			ver=(ver)
-			Scheme’s Version This parameter is used in NaviCon’s internal processing.. The decimal number needs to be set to this parameter. If this parameter is blank or undefined, an error will occur. 
-	================================================
-			ll=(lat)
-			(lng) Coordinates (lat., lng.) This parameter is used to set Pin on NaviCon.  (lat) means latitude[°] and (lng) means longitude[°]. Both of them need to be set with decimal number. Datum is WGS84.【Range】-90.0 ＜ lat ＜ 90.0　　－180.0 ≦ lng ≦ 180.0 If your application set value outside of the range, or either LI (POI Coordinates) or addr (POI Address) is blank, an error will occur.
-	========================
-			
-			addr=(addr)
-	Address
-	This parameter is used to display address on the POI detail screen on NaviCon.
-	Put a blank between names of building and block number, if you would like to set both of them. 
-	If this parameter is not set, the address is not displayed on POI detail screen.
-	If LI (POI Coordinates) is undefined, POI Coordinates are set via Google API search with this parameter.
-	If Both LI (POI Coordinates) and addr (POI Address) are blank or undefined, an error will occur
-	========================
-	
-	appName=(appName)	Application ID/Website ID (*1) 
-	This parameter is used NaviCon’s internal processing.
-	Smartphone application: Application ID
-	Website: Website ID
-	If this parameter is blank or undefined, an error will occur.
-	Title=(title)	Title.
-	This parameter is used to display location name on balloon view and POI detail screen..
-	The number of characters is unlimited. However, if it exceeds the display range, those characters beyond that are omitted (Display Range: around 26 one-byte or 13 two-byte letters).
-	If this parameter is blank or undefined, “Untitled”.
-	* How to omit: Replace excessive letters with “…”.
-	radKM=(radKM)	Map Scale（ｋｍ）
-	This parameter is used to adjust map scale of NaviCon.
-	Specify NaviCon’s map scale with the radius of the circle (KM) centering POI coordinates.
-	(redKM) has priority over (redML) if both of them are set.
-	Last screen’s scale is used if neither of them is blank or undefined.
-	Approximate range can be set with this parameter because map scale is automatically adjusted by Google MAP API.
-	【Range】
-　	0 < radKM
-	If its value of this parameter is larger than the radius of the Earth, it is rounded to 1/2 the circumference of the Earth.
-	radML=(radML)	Map Scale（mile）
-	This parameter is used to adjust map scale of NaviCon.
-	Specify NaviCon’s map scale with the radius of the circle (KM) centering POI coordinates.
-	(redKM) has priority over (redML) if both of them are set.
-	Last screen’s scale is used if neither of them is blank or undefined.
-	Approximate range can be set with this parameter because map scale is automatically adjusted by Google MAP API.
-	【Range】
-	　0 < radML
-	If its value of this parameter is larger than the radius of the Earth, it is rounded to 1/2 the circumference of the Earth.
-	tel=(tel)	Phone Number
-	This parameter is used to display phone number on the POI detail screen.
-	Numbers (0 to 9) and signs (+, *, #) can be set as the parameter (without -).
-	If the parameter is blank or undefined, phone number is not displayed. 
-	text=(text)	Text
-	This parameter is used to display message on pup-up window after starting NaviCon or on POI detail screen. It is used to show optional messages to NaviCon users from your application/website.
-	The number of characters is unlimited. However, if it exceeds the display range, those characters beyond that are omitted (Display Range: around 26 one-byte or 13 two-byte letters). 
-	If this parameter is blank or undefined, nothing will be displayed.
-	* How to omit: Replace excessive letters with “…”.
+	Ti.API.trace("NAVIBRIDGE module initiated");
 
+	/** Do not modify these values */
+	var API = {
+		Version: "1.3",
+		URLBase: "navicon://",
+		Install: {
+			iOS: "http://itunes.apple.com/us/app/navibridge/id498898448?mt=8",
+			Android: "http://appcappstore.s3.amazonaws.com/navibridge/NaviBridge_Appcelerator_test_v3.3f.apk"
+		},
+		ApplicationId: null,
+		Platform: Ti.Platform.osname === "iphone" || Ti.Platform.osname ==="ipad" ? "ios" : Ti.Platform.osname == "android" ? "android" : "mobileweb"
+	};
 
-	========================
-	callURL=(callURL)
-	URL to invoke your application/web site from NaviCon
-	This parameter is used to invoke your application/web site from NaviCon after NaviCon sends POI to car navigation system. Your application can achieve to provide a seamless service to users by using this parameter.
-	When NaviCon can’t send POI to car navigation system, NaviCon doesn’t invoke your application/web site. 
-	
+	/**
+	 * Sets the Denso-approved Application ID to authenticate NaviBridge calls
+	 * @param {String} _id The Application ID provided by Denso
 	 */
-	
-	API.SetApplicationID = function(appID) {
-		NAVIBRIDGE.ApplicationID = appID;
-	}//end authorize
-	
-	API.openNavi = function() {
-		API.fireConsoleEvent( "canOpenURL" + API.URLschemeBASE );
-		
-		if (Ti.Platform.canOpenURL(API.URLschemeBASE)){
-			API.fireConsoleEvent( "App installed, opening app:" + API.URLschemeBASE );
-			Ti.Platform.openURL(API.URLschemeBASE);
-		}//end if true
-		else
-		{
-			alert("NaviBridge must be Installed on this device!");
-			API.fireConsoleEvent( "App not installed, calling install" );
-			API.installNavi();
-		}//end else
-	}//end openNavi
-	
-	API.installNavi = function() {
-		API.fireConsoleEvent( "open install:" + API.installIPhone );
-		Ti.Platform.openURL(API.installIPhone);
-	}//end installNavi
-	
-	API.addPOI = function( poi ) {
-		var appURL = "navicon://setPOI?ver=1.3&ll=37.38922,-122.048496&appName="+API.ApplicationID;
-		
-		if ( poi != null ){
-			
-			appURL = "navicon://setPOI?ver=1.3&ll=37.38922,-122.048496&appName="+API.ApplicationID;
-			
-			if ( poi.lat != null ) {
-				if ( poi.lon != null ) {
-					appURL = "navicon://setPOI?ver=1.3&ll="+poi.lat+","+poi.lon; 
-					
-					if ( poi.title != null )
-					{
-						appURL += "&title=" + poi.title;
-					}
-					if ( poi.tel != null )
-					{
-						appURL += "&tel=" + poi.tel;
-					}
-					if ( poi.text != null )
-					{
-						appURL += "&text=" + poi.text;
-					}
-					if ( poi.callURL != null )
-					{
-						appURL += "&callURL=" + poi.callURL;
-					}//end if callURL
-					
-					appURL += "&appName="+API.ApplicationID;
-				}//end if
-				else
-				{
-					Ti.API.info("ERROR: POI Null" );
-					return;
-				}//end else no lon defined
-			}//end set lat lon
-			else
-			{
-				Ti.API.info("ERROR: POI Null" );
-				return;
-			}//end else if no lat defined
-		}//end poi
-		else
-		{
-			Ti.API.info("ERROR: POI Null" );
-			return;
+	API.setApplicationId = function(_id) {
+		Ti.API.trace("NAVIBRIDGE.setApplicationId()");
+
+		if(API.isDefined(_id)) {
+			API.ApplicationId = _id;
 		}
-		API.fireConsoleEvent( "addPOI =>"  + appURL );
-		
-		Ti.Platform.openURL(appURL);
-	}//end addPOI
-	
-	API.addPOIMultiple = function( wayPointArray ) {
-		Ti.API.info( "addPOIMultiple => NOT IMPLIMENTED " );
-		Ti.Platform.openURL("navicon://setPOI?ver=1.3&ll=37.38922,-122.048496&appName=ICiAV4Ay");
-	}//end addPOIMultiple
-	
-	API.fireConsoleEvent = function ( notes ) {
-		Ti.App.fireEvent('ti.navibridge.admin.console', { message: notes });
-	}//end fireConsoleEvent
-	
-	API.factoryAdminView = function( ) {
-		var topView = Ti.UI.createView({ top: 0, height: 600 });
-		
-		var versionLabel = Ti.UI.createLabel({
-				top: 0, left: 0, height: 10,
-				color: 'black',
-				text:"v" + Titanium.App.getVersion() + " ",
-				font: {fontSize: 6}
-		});//end versionLabel
-		topView.add( versionLabel );
-		
-		//and the trigger button
-		var OpenButton = Ti.UI.createButton({ top:5, title:'Open NaviBridge', height:40, width:200 });
-		OpenButton.addEventListener('click', function(){ NAVIBRIDGE.openNavi(); });
-		topView.add( OpenButton );
-		
-		var InstallButton = Ti.UI.createButton({ top:50, title:'Install NaviBridge', height:40, width:200 });
-		InstallButton.addEventListener('click', function(){ NAVIBRIDGE.installNavi();  });
-		topView.add( InstallButton );
-		
-		var InsertPOIButton = Ti.UI.createButton({ top:95, title:'Insert POI', height:40, width:200 });
-		InsertPOIButton.addEventListener('click', function(){ NAVIBRIDGE.addPOI({ lat:37.38922, lon:-122.048496});  });
-		topView.add( InsertPOIButton );
-		
-		var InsertPOIArrayButton = Ti.UI.createButton({ top:140, title:'Insert Multiple POIs', height:40, width:200 });
-		InsertPOIArrayButton.addEventListener('click', function(){ NAVIBRIDGE.addPOIMultiple(
-				{lat:"37.38922", lon:"-122.048496", title:"Appc"},
-				{lat:"37.38922", lon:"-122.048496", title:"Appc"},
-				{lat:"37.38922", lon:"-122.048496", title:"Appc"}
-		) });//end
-		topView.add( InsertPOIArrayButton );
-		
-		//add the console
-		var console = Ti.UI.createLabel({
-				top: 200, left: 5, right: 5, height: 160,
-				backgroundColor: 'white', color: 'black',
-				text:" ... waiting ...",
-				font: {fontSize: 12}, verticalAlign: 'top'
-		});
-		topView.add( console )
-		
-		function addMsg(msg) {
-			var text = console.text;
-			if (text && text.length > 0) {
-				text = msg + '\n' + text;
+	};
+
+	/**
+	 * Legacy support
+	 * @deprecated
+	 */
+	API.SetApplicationID = function(_id) {
+		Ti.API.info("NAVIBRIDGE.SetApplicationID() is deprecated; use NAVIBRIDGE.setApplicationId()");
+
+		API.setApplicationId(_id);
+	};
+
+	/**
+	 * Opens the NaviBridge application on the user device, or installs NaviBridge if necessary
+	 */
+	API.openNavi = function() {
+		Ti.API.trace("NAVIBRIDGE.openNavi()");
+
+		if(API.checkInstall()) {
+			Ti.Platform.openURL(API.URLBase);
+		} else {
+			Ti.API.error("NaviBridge is not installed");
+
+			API.installNavi();
+		}
+	};
+
+	/**
+	 * Determines if the NaviBridge application is installed on the user device
+	 */
+	API.checkInstall = function() {
+		Ti.API.trace("NAVIBRIDGE.checkInstall()");
+
+		if(Ti.Platform.canOpenURL(API.URLBase)) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
+	/**
+	 * Promps the user to install the NaviBridge application on their device
+	 */
+	API.installNavi = function() {
+		Ti.API.trace("NAVIBRIDGE.installNavi()");
+
+		if(!API.checkInstall()) {
+			var alert = Ti.UI.createAlertDialog({
+				title: "NaviBridge Not Installed",
+				message: "This action requires you install the NaviBridge application",
+				buttonNames: [ "OK", "Cancel" ],
+				cancel: 1
+			});
+
+			alert.addEventListener("click", function(_event) {
+				if(_event.index === 0) {
+					var installURL;
+
+					switch(API.Platform) {
+						case "ios":
+							installURL = API.Install.iOS;
+							break;
+						case "android":
+							installURL = API.Install.Android;
+							break;
+						case "mobileweb":
+							Ti.API.error("NaviBridge not available for mobile web");
+							return;
+							break;
+					}
+
+					Ti.API.info("Installing NaviBridge application");
+
+					Ti.Platform.openURL(installURL);
+				} else {
+					Ti.API.info("User aborted NaviBridge installation");
+				}
+			});
+
+			alert.show();
+		} else {
+			Ti.API.info("NaviBridge is already installed");
+		}
+	};
+
+	/**
+	 * Adds a POI (point of interest) waypoint to the NaviBridge application
+	 * @param {Object} _poi The POI object (see dictionary definition below)
+	 * @param {String|Number} _poi.lat The longitude for the POI (must exist if no 'address')
+	 * @param {String|Number} _poi.lon The latitude for the POI (must exist if no 'address')
+	 * @param {String} _poi.address The address for the POI (must exist if no 'lat'/'lon')
+	 * @param {String|Number} _poi.radiusKM The map zoom radius in KM (has priority over radiusMI) (optional)
+	 * @param {String|Number} _poi.radiusMI The map zoom radius in MI (optional)
+	 * @param {String} _poi.title The title text for the POI pin within NaviBridge (optional)
+	 * @param {String|Number} _poi.tel The telephone number for the POI [0-9+*#](optional)
+	 * @param {String} _poi.text A message to display on the in-dash screen after sending data to NaviBridge (optional)
+	 * @param {Function} _poi.callbackURL The callback URL for the application sending data to NaviBridge (optional)
+	 * @return {Bool} Returns false on error
+	 */
+	API.addPOI = function(_poi) {
+		Ti.API.trace("NAVIBRIDGE.addPOI()");
+
+		if(API.checkInstall()) {
+			if(typeof _poi === "object" && _poi !== null) {
+				if((!API.isDefined(_poi.lat) || !API.isDefined(_poi.lon)) && !API.isDefined(_poi.addr)) {
+					Ti.API.error("POI object must have 'lat' and 'lon' properties, or 'addr' property");
+
+					return false;
+				} else {
+					var appURL = API.URLBase + "setPOI?ver=" + API.Version;
+
+					if(API.isDefined(_poi.lat) && API.isDefined(_poi.lon)) {
+						appURL += API.appendURL("ll", _poi.lat + "," + _poi.lon);
+					}
+
+					appURL += API.appendURL("addr", _poi.address);
+					appURL += API.appendURL("appName", API.ApplicationId);
+					appURL += API.appendURL("title", _poi.title);
+					appURL += API.appendURL("radKM", _poi.radiusKM);
+					appURL += API.appendURL("radML", _poi.radiusMI);
+					appURL += API.appendURL("tel", _poi.tel);
+					appURL += API.appendURL("text", _poi.text);
+					appURL += API.appendURL("callURL", _poi.callbackURL);
+
+					Ti.API.info(appURL);
+
+					Ti.Platform.openURL(appURL);
+				}
 			} else {
-				text = msg;
+				Ti.API.error("Incorrect POI data type given (or null)");
+
+				return false;
 			}
-			console.text = text;
-		}//end addMsg
-		
-		Ti.App.addEventListener('ti.navibridge.admin.console', function(data) {
-			addMsg('admin.console: "' + data.message + '"');
-		});
-		return topView;
-		
-	}//end factoryAdminView
-  	
-  	return API;
-})(); //end NAVIBRIDGE
+		} else {
+			Ti.API.error("NaviBridge is not installed");
+
+			API.installNavi();
+
+			return false;
+		}
+	};
+
+	/**
+	 * Adds multiple POI (point of interest) waypoints to the NaviBridge application
+	 * @param {Object} _object An object of POIs and meta-data
+	 * @param {Array} _object.poi An array of POIs [max. 5] including lat, lon, address, title, & tel (see "addPOI()" method documentation for definitions)
+	 * @example
+	 * 	{
+	 * 		poi: [
+	 * 			{
+	 * 				lat: x, lon: x, address: x, title: x, tel: x
+	 * 			},
+	 * 			{
+	 * 				lat: x, lon: x, address: x, title: x, tel: x
+	 * 			},
+	 * 		],
+	 * 		callbackURL: "schema://",
+	 * 		text: "POI added successfully"
+	 * 	}
+	 */
+	API.addMultiPOI = function(_object) {
+		Ti.API.trace("NAVIBRIDGE.addMultiPOI()");
+
+		if(API.checkInstall()) {
+			if(typeof _object === "object" && _object !== null) {
+				if(API.isDefined(_object.poi)) {
+					if(_object.poi.length > 5) {
+						Ti.API.info("Too many POI items provided; limiting to 5");
+					}
+
+					var length = _object.poi.length > 5 ? 5 : _object.poi.length;
+
+					var appURL = API.URLBase + "setMultiPOI?ver=" + API.Version;
+
+					appURL += API.appendURL("appName", API.ApplicationId);
+
+					for(var i = 0; i < length; i++) {
+						var poi = _object.poi[i];
+
+						if(API.isDefined(poi.lat) && API.isDefined(poi.lon)) {
+							appURL += API.appendURL("ll" + (i + 1), poi.lat + "," + poi.lon);
+						}
+
+						appURL += API.appendURL("addr" + (i + 1), poi.address);
+						appURL += API.appendURL("title" + (i + 1), poi.title);
+						appURL += API.appendURL("tel" + (i + 1), poi.tel);
+					}
+
+
+					appURL += API.appendURL("text", _object.text);
+					appURL += API.appendURL("callURL", _object.callbackURL);
+
+					Ti.API.info(appURL);
+
+					Ti.Platform.openURL(appURL);
+				} else {
+					Ti.API.error("No POIs found");
+
+					return false;
+				}
+			} else {
+				Ti.API.error("Incorrect POI data type given (or null)");
+
+				return false;
+			}
+		} else {
+			Ti.API.error("NaviBridge is not installed");
+
+			API.installNavi();
+
+			return false;
+		}
+	};
+
+	/**
+	 * Appends a value to a URL string
+	 * @param {String} _key The key for the item
+	 * @param {String} _value The value for the item
+	 */
+	API.appendURL = function(_key, _value) {
+		if(API.isDefined(_value)) {
+			return "&" + _key + "=" + _value;
+		} else {
+			return "";
+		}
+	};
+
+	/**
+	 * Verifies a value is defined and is not null
+	 * @param _value The value to check
+	 */
+	API.isDefined = function(_value) {
+		if(typeof _value !== "undefined" && _value !== null) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
+	return API;
+})();
 
 module.exports = NAVIBRIDGE;
